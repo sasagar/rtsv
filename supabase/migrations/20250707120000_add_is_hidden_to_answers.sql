@@ -1,0 +1,2 @@
+ALTER TABLE public.answers
+ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE;

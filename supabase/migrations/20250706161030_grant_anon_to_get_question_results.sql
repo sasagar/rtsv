@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION get_question_results(INTEGER) TO anon;
