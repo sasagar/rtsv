@@ -1,2 +1,0 @@
-ALTER TABLE public.answers
-ADD COLUMN is_picked BOOLEAN DEFAULT FALSE;

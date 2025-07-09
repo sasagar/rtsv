@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Real-time Survey Tool
+
+This is a real-time audience reaction tool built with Next.js, Supabase, and Socket.IO.
+
+## Features
+
+- **Real-time updates:** Questions and results are updated in real-time using Socket.IO.
+- **Multiple question types:** Supports multiple-choice, multiple-select, and free-text questions.
+- **Presenter view:** A dedicated view for presenters to display questions and results to the audience.
+- **Admin view:** A dedicated view for administrators to manage events and questions.
+- **Audience view:** A dedicated view for audience members to answer questions.
+- **Invite-based User Registration:** User registration for administrators requires an invite code, ensuring controlled access.
+- **Presenter Screen Customization:** Administrators can customize the background and text colors of the presenter screen. Picked answers automatically adjust their text color for optimal visibility.
+
+## Tech Stack
+
+- **Framework:** [Next.js](https://nextjs.org/)
+- **Backend:** [Supabase](https://supabase.io/)
+- **Real-time:** [Socket.IO](https://socket.io/)
+- **UI:** [Radix UI](https://www.radix-ui.com/) and [Tailwind CSS](https://tailwindcss.com/)
+- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/)
+- **Documentation:** [TypeDoc](https://typedoc.org/)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18 or later)
+- npm
+- Supabase account
+
+### Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/your-username/rtsv.git
+   cd rtsv
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+
+   Create a `.env.local` file in the root of the project and add your Supabase URL and anon key. You can use the `.env.local.example` file as a template.
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+   ```
+
+4. **Set up Supabase database:**
+
+   Run the SQL migration scripts located in the `supabase/migrations` directory in your Supabase project. You can use the Supabase CLI for this:
+
+   ```bash
+   # Link your local project to your Supabase project (replace YOUR_PROJECT_REF)
+   supabase link --project-ref YOUR_PROJECT_REF
+
+   # Push migrations to your Supabase database
+   supabase db push
+   ```
+
+   **Note:** Ensure you have created the `invite_codes` table and the `signup_with_invite` function as defined in the migrations. Also, the `events` table now includes `background_color` and `text_color` columns. For initial invite codes, you will need to manually insert them into the `invite_codes` table via the Supabase dashboard.
+
+5. **Run the development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Usage
+
+- **Admin Dashboard:** `/admin`
+  - Requires user login with a valid invite code for registration.
+  - Only logged-in users can create and manage events.
+  - **Display Settings:** Customize the background and text colors for the presenter screen.
+- **Presenter View:** `/presenter/[eventId]`
+  - Publicly accessible. Displays real-time results for a specific event.
+- **Audience View:** `/event/[accessCode]`
+  - Publicly accessible. Allows participants to answer questions for a specific event.
+
+## Invite Code Management (for System Administrators)
+
+To allow new users to register as administrators, you need to issue invite codes. Currently, this is done manually:
+
+1.  Go to your Supabase project dashboard.
+2.  Navigate to the `Table Editor`.
+3.  Select the `invite_codes` table.
+4.  Insert a new row with the following details:
+    - `code`: A unique string (e.g., `MYSECRETINVITE`)
+    - `max_uses`: The maximum number of times this code can be used (e.g., `1` for single use, `0` for unlimited)
+    - `expires_at`: A future timestamp when the code will expire (e.g., `2025-12-31T23:59:59Z`)
+
+Users can then use this `code` during the sign-up process.
+
+## Documentation Generation
+
+To generate the API documentation from JSDoc comments:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run docs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The generated HTML documentation will be available in the `./docs` directory. Open `docs/index.html` in your browser to view it.

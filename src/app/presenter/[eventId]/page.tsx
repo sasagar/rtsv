@@ -19,6 +19,24 @@ import { getQuestionTypeLabel } from '@/lib/questionUtils';
 
 
 /**
+ * Determines whether to use white or black text for contrast based on a given background color.
+ * @param {string} hexcolor - The background color in hexadecimal format (e.g., #RRGGBB).
+ * @returns {string} '#FFFFFF' for dark backgrounds, '#000000' for light backgrounds.
+ */
+const getContrastTextColor = (hexcolor: string): string => {
+  if (!hexcolor || hexcolor.length < 7) return '#000000'; // Default to black if invalid
+
+  const r = parseInt(hexcolor.substring(1, 3), 16);
+  const g = parseInt(hexcolor.substring(3, 5), 16);
+  const b = parseInt(hexcolor.substring(5, 7), 16);
+
+  // Calculate luminance (perceived brightness)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  return luminance > 0.5 ? '#000000' : '#FFFFFF'; // Use black for light, white for dark
+};
+
+/**
  * Displays the results of a question for the presenter view.
  * It shows a bar chart for multiple-choice/select questions and a list of free-text answers.
  * Free-text answers that are marked as hidden will not be displayed.
@@ -89,15 +107,20 @@ const QuestionResultDisplay = ({ question, results }: QuestionResultDisplayProps
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                         {data.length > 0 ? (
-                            data.map((item, index) => (
-                                <div key={index} className="col-span-1">
-                                    <div
-                                        className={`p-4 h-full flex flex-col justify-between rounded-md transition-all duration-300 ease-in-out ${item.is_picked ? 'shadow-lg bg-orange-50 border-2 border-orange-400' : 'shadow-sm bg-white border border-gray-200'}`}
-                                    >
-                                        <p className="break-words text-base">{item.name}</p>
+                            data.map((item, index) => {
+                                const cardBgColor = item.is_picked ? '#FFD700' : '#FFFFFF'; // Gold for picked, white for others
+                                const cardTextColor = getContrastTextColor(cardBgColor);
+                                return (
+                                    <div key={index} className="col-span-1">
+                                        <div
+                                            className={`p-4 h-full flex flex-col justify-between rounded-md transition-all duration-300 ease-in-out ${item.is_picked ? 'shadow-lg border-2 border-orange-400' : 'shadow-sm border border-gray-200'}`}
+                                            style={{ backgroundColor: cardBgColor, color: cardTextColor }}
+                                        >
+                                            <p className="break-words text-base">{item.name}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div className="col-span-full">
                                 <p className="text-sm text-gray-500">まだ回答がありません。</p>
@@ -138,7 +161,7 @@ export default function PresenterPage() {
   const currentQuestion = displayedQuestions.find(q => q.id === currentDisplayedQuestionId);
 
   return (
-    <div className="h-screen flex flex-col w-full">
+    <div className="h-screen flex flex-col w-full" style={{ backgroundColor: event.background_color || '#FFFFFF', color: event.text_color || '#000000' }}>
       <div className="my-0 p-4 text-center shadow-md rounded-none">
         <h1 className="text-4xl font-bold mb-1">
           {currentQuestion ? currentQuestion.text : '質問を選択してください'}

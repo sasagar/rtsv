@@ -112,7 +112,7 @@ const AdminAddQuestionForm: React.FC<AdminAddQuestionFormProps> = ({ eventId, on
               </SelectContent>
             </Select>
           </div>
-          (['multiple-choice', 'multiple-select']).includes(newQuestionType) &&
+          {(['multiple-choice', 'multiple-select']).includes(newQuestionType) && (
             <div className="grid gap-2">
               <Label>選択肢</Label>
               {newQuestionOptions.map((option, index) => (
@@ -132,6 +132,7 @@ const AdminAddQuestionForm: React.FC<AdminAddQuestionFormProps> = ({ eventId, on
                 選択肢を追加
               </Button>
             </div>
+          )}
           <div className="flex items-center space-x-2">
             <Checkbox
               id="allowMultipleAnswers"

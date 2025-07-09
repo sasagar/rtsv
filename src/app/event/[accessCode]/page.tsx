@@ -27,6 +27,12 @@ interface AnswerPayload {
   selected_options?: string[];
 }
 
+interface UserAnswer {
+  question_id: number;
+  answer_text?: string;
+  selected_options?: string[];
+}
+
 /**
  * Props for the AnswerForm component.
  * @interface
@@ -36,16 +42,12 @@ interface AnswerFormProps {
   eventId: number;
   onAnswerSubmit: (questionId: number, answerPayload: AnswerPayload) => void;
   hasAnswered: boolean;
+  userAnswer?: UserAnswer; // ユーザーの過去の回答を追加
 }
 
 import { supabase } from '@/lib/supabaseClient';
 import { useSocket } from '@/hooks/useSocket';
 import { getSessionId } from '@/lib/utils';
-/**
- * Generates or retrieves a unique session ID for the user.
- * The session ID is stored in sessionStorage to persist across page reloads within the same session.
- * @returns {string | null} The session ID, or null if not in a browser environment.
- */
 
 
 /**
@@ -58,17 +60,18 @@ import { getSessionId } from '@/lib/utils';
  * @param {boolean} props.hasAnswered - Indicates if the user has already answered this question.
  * @returns {JSX.Element} The rendered answer form component.
  */
-const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered }: AnswerFormProps) => {
-    const [textAnswer, setTextAnswer] = useState<string>('');
-    const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered, userAnswer }: AnswerFormProps) => {
+    const [textAnswer, setTextAnswer] = useState<string>(userAnswer?.answer_text || '');
+    const [selectedOption, setSelectedOption] = useState<string | null>(userAnswer?.selected_options?.[0] || null);
+    const [selectedOptions, setSelectedOptions] = useState<string[]>(userAnswer?.selected_options || []);
 
     useEffect(() => {
         // Reset form state when question changes or is re-opened
-        setTextAnswer('');
-        setSelectedOption(null);
-        setSelectedOptions([]);
-    }, [question]);
+        // If there's a userAnswer for the new question, pre-fill the form
+        setTextAnswer(userAnswer?.answer_text || '');
+        setSelectedOption(userAnswer?.selected_options?.[0] || null);
+        setSelectedOptions(userAnswer?.selected_options || []);
+    }, [question, userAnswer]); // userAnswer も依存配列に追加
 
     const handleMultipleSelect = (option: string) => {
         const newSelection = selectedOptions.includes(option)
@@ -77,7 +80,7 @@ const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered }: AnswerFo
         setSelectedOptions(newSelection);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => { // async を追加
         let answerPayload: AnswerPayload;
         switch (question.question_type) {
             case 'free-text':
@@ -103,7 +106,26 @@ const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered }: AnswerFo
                 break;
             default: return;
         }
-        onAnswerSubmit(question.id, answerPayload);
+
+        // 回答の更新ロジック
+        if (userAnswer) { // 既存の回答がある場合
+            const { error } = await supabase.from('answers')
+                .update({ ...answerPayload, updated_at: new Date().toISOString() }) // updated_at を更新
+                .eq('question_id', question.id)
+                .eq('session_id', getSessionId()); // 現在のセッションIDで特定
+
+            if (error) {
+                toast('回答の更新に失敗しました。', {
+                    description: error.message,
+                });
+                console.error('Answer update error:', error);
+            } else {
+                toast('回答を更新しました！');
+                onAnswerSubmit(question.id, answerPayload); // 親コンポーネントに通知
+            }
+        } else { // 新規回答の場合
+            onAnswerSubmit(question.id, answerPayload);
+        }
     };
 
     if (hasAnswered && !question.allow_multiple_answers) {
@@ -114,6 +136,12 @@ const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered }: AnswerFo
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground">この質問にはすでに回答済みです。</p>
+                    {userAnswer && question.question_type === 'free-text' && (
+                        <p className="mt-2 text-sm font-semibold">あなたの回答: <span className="font-normal">{userAnswer.answer_text}</span></p>
+                    )}
+                    {userAnswer && (question.question_type === 'multiple-choice' || question.question_type === 'multiple-select') && userAnswer.selected_options && (
+                        <p className="mt-2 text-sm font-semibold">あなたの選択: <span className="font-normal">{userAnswer.selected_options.join(', ')}</span></p>
+                    )}
                 </CardContent>
             </Card>
         );
@@ -133,15 +161,22 @@ const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered }: AnswerFo
                             placeholder="回答を入力してください。"
                             value={textAnswer}
                             onChange={(e) => setTextAnswer(e.target.value)}
+                            className="min-h-[100px]" // スマートフォンでの入力に適した高さ
                         />
                     </div>
                 )}
                 {question.question_type === 'multiple-choice' && question.options && (
                     <RadioGroup value={selectedOption} onValueChange={setSelectedOption} className="grid gap-2">
                         {question.options.map((opt, i) => (
-                            <div key={i} className="flex items-center space-x-2">
-                                <RadioGroupItem value={opt} id={`option-${question.id}-${i}`} />
-                                <Label htmlFor={`option-${question.id}-${i}`}>{opt}</Label>
+                            <div
+                                key={i}
+                                className={`flex items-center space-x-2 p-2 border rounded-md cursor-pointer transition-colors duration-200 ${
+                                    selectedOption === opt ? 'bg-blue-100 border-blue-500' : 'bg-white border-gray-200 hover:bg-gray-50'
+                                }`}
+                                onClick={() => setSelectedOption(opt)} // div 全体をタップ可能にする
+                            >
+                                <RadioGroupItem value={opt} id={`option-${question.id}-${i}`} className="sr-only" /> {/* 視覚的に非表示にする */}
+                                <Label htmlFor={`option-${question.id}-${i}`} className="flex-grow py-1 cursor-pointer">{opt}</Label>
                             </div>
                         ))}
                     </RadioGroup>
@@ -149,19 +184,26 @@ const AnswerForm = ({ question, eventId, onAnswerSubmit, hasAnswered }: AnswerFo
                 {question.question_type === 'multiple-select' && question.options && (
                     <div className="grid gap-2">
                         {question.options.map((opt, i) => (
-                            <div key={i} className="flex items-center space-x-2">
+                            <div
+                                key={i}
+                                className={`flex items-center space-x-2 p-2 border rounded-md cursor-pointer transition-colors duration-200 ${
+                                    selectedOptions.includes(opt) ? 'bg-blue-100 border-blue-500' : 'bg-white border-gray-200 hover:bg-gray-50'
+                                }`}
+                                onClick={() => handleMultipleSelect(opt)} // div 全体をタップ可能にする
+                            >
                                 <Checkbox
                                     id={`checkbox-${question.id}-${i}`}
                                     checked={selectedOptions.includes(opt)}
                                     onCheckedChange={() => handleMultipleSelect(opt)}
+                                    className="sr-only" // 視覚的に非表示にする
                                 />
-                                <Label htmlFor={`checkbox-${question.id}-${i}`}>{opt}</Label>
+                                <Label htmlFor={`checkbox-${question.id}-${i}`} className="flex-grow py-1 cursor-pointer">{opt}</Label>
                             </div>
                         ))}
                     </div>
                 )}
                 <Button onClick={handleSubmit} className="mt-4 w-full">
-                    回答する
+                    {userAnswer ? '回答を更新する' : '回答する'} {/* ボタンテキストを変更 */}
                 </Button>
             </CardContent>
         </Card>
@@ -181,6 +223,7 @@ export default function EventPage() {
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]); // ユーザーの回答履歴を追加
   const { socket, isConnected } = useSocket(event?.id ? String(event.id) : null);
 
   useEffect(() => {
@@ -189,7 +232,7 @@ export default function EventPage() {
 
   const fetchEventAndQuestions = useCallback(async () => {
     const currentSessionId = getSessionId();
-    if (!accessCode || !currentSessionId) return;
+    if (!accessCode) return;
 
     setLoading(true);
     const { data: eventData, error: eventError } = await supabase
@@ -217,12 +260,13 @@ export default function EventPage() {
     // Fetch questions this session has already answered
     const { data: answeredData } = await supabase
       .from('answers')
-      .select('question_id')
-      .eq('session_id', sessionId);
+      .select('question_id, answer_text, selected_options') // 回答内容も取得
+      .eq('session_id', currentSessionId);
 
     if (answeredData) {
       const answeredIds = new Set(answeredData.map(a => a.question_id));
       setAnsweredQuestions(answeredIds);
+      setUserAnswers(answeredData as UserAnswer[]); // ユーザーの回答履歴を保存
     }
 
     setLoading(false);
@@ -352,6 +396,7 @@ export default function EventPage() {
             eventId={event.id}
             onAnswerSubmit={handleAnswerSubmit}
             hasAnswered={answeredQuestions.has(q.id)}
+            userAnswer={userAnswers.find(ans => ans.question_id === q.id)} // ユーザーの回答を渡す
           />
         ))
       ) : (

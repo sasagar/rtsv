@@ -6,6 +6,10 @@ export interface Event {
   id: number;
   name: string;
   access_code: string;
+  /** The background color of the presenter screen. */
+  background_color?: string;
+  /** The text color of the presenter screen. */
+  text_color?: string;
 }
 
 /**

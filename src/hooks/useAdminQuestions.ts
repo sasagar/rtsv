@@ -75,7 +75,7 @@ export const useAdminQuestions = (eventId: string | undefined): {
     const fetchEventAndQuestions = async () => {
       if (!eventId) return;
 
-      const { data: eventData, error: eventError } = await supabase.from('events').select().eq('id', eventId).single();
+      const { data: eventData, error: eventError } = await supabase.from('events').select('*, background_color, text_color').eq('id', eventId).single();
       if (eventError || !eventData) {
         console.error('Error fetching event:', eventError);
         return;

@@ -1,0 +1,14 @@
+{
+  "entryPoints": ["./src/**/*.ts", "./src/**/*.tsx"],
+  "exclude": ["./src/components/ui", "./src/pages/api"],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "hideGenerator": true,
+  "includeVersion": true,
+  "json": "./docs/documentation.json",
+  "out": "./docs",
+  "theme": "default",
+  "name": "Real-time Survey Tool Documentation",
+  "tsconfig": "./tsconfig.typedoc.json"
+}

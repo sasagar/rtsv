@@ -1,0 +1,32 @@
+name: Deploy JSDoc to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Adjust this to your default branch if it's not 'main'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or your project's Node.js version
+
+      - name: Install dependencies 📦
+        run: npm install
+
+      - name: Generate JSDoc 📄
+        run: npm run docs
+
+      - name: Deploy to GitHub Pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          # cname: example.com # Uncomment and replace with your custom domain if you have one

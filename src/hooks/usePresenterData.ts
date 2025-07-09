@@ -39,7 +39,7 @@ export const usePresenterData = (eventId: string | undefined) => {
       setLoading(true);
       const { data: eventData, error: eventError } = await supabase
         .from('events')
-        .select('*')
+        .select('*, background_color, text_color')
         .eq('id', eventId)
         .single();
 
