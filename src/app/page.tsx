@@ -22,7 +22,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
           {/* Admin Card */}
           <Card className="flex flex-col items-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader>
+            <CardHeader className="w-full">
               <CardTitle className="text-2xl font-semibold">管理者</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-4">
@@ -37,7 +37,7 @@ export default function Home() {
 
           {/* Audience Card */}
           <Card className="flex flex-col items-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader>
+            <CardHeader className="w-full">
               <CardTitle className="text-2xl font-semibold">参加者</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-4">
@@ -54,11 +54,11 @@ export default function Home() {
 
           {/* Presenter Card */}
           <Card className="flex flex-col items-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader>
+            <CardHeader className="w-full">
               <CardTitle className="text-2xl font-semibold">プレゼンター</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-4">
-              <CardDescription className="text-center">
+              <CardDescription className="text-center whitespace-normal">
                 ライブ結果を聴衆に表示します。
               </CardDescription>
               <Link href="/presenter/YOUR_EVENT_ID" passHref> {/* Placeholder for event ID */}
