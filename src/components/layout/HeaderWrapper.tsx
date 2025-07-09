@@ -11,7 +11,7 @@ import Header from './Header';
  */
 export default function HeaderWrapper() {
   const pathname = usePathname();
-  const isPresenterPage = pathname.startsWith('/presenter/');
+  const isPresenterPage = pathname?.startsWith('/presenter/') || false;
 
   return (
     <>
