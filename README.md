@@ -65,6 +65,35 @@ This is a real-time audience reaction tool built with Next.js, Supabase, and Soc
    supabase db push
    ```
 
+   Alternatively, for local development, you can run Supabase locally using the Supabase CLI.
+
+   1.  **Install Supabase CLI:**
+       If you haven't already, install the Supabase CLI.
+       ```bash
+       brew install supabase/supabase/supabase # macOS
+       # or follow instructions for your OS: https://supabase.com/docs/guides/cli/getting-started#install-the-cli
+       ```
+
+   2.  **Start local Supabase services:**
+       Navigate to the `supabase` directory and start the local services.
+       ```bash
+       cd supabase
+       supabase start
+       ```
+       This will output the local Supabase URL and anon key. Update your `.env.local` file with these values.
+
+   3.  **Apply migrations to local Supabase:**
+       From the project root, push your migrations to the local Supabase instance.
+       ```bash
+       supabase db push
+       ```
+
+   4.  **Seed local database (Optional):**
+       If you have a `seed.sql` file (e.g., `supabase/seed.sql`) for initial data, you can run it.
+       ```bash
+       supabase db seed
+       ```
+
    **Note:** Ensure you have created the `invite_codes` table and the `signup_with_invite` function as defined in the migrations. Also, the `events` table now includes `background_color` and `text_color` columns. For initial invite codes, you will need to manually insert them into the `invite_codes` table via the Supabase dashboard.
 
 5. **Run the development server:**

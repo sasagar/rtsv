@@ -65,6 +65,35 @@
    supabase db push
    ```
 
+   または、ローカル開発のために、Supabase CLIを使用してSupabaseをローカルで実行できます。
+
+   1.  **Supabase CLIのインストール:**
+       まだインストールしていない場合は、Supabase CLIをインストールします。
+       ```bash
+       brew install supabase/supabase/supabase # macOS
+       # または、お使いのOSの手順に従ってください: https://supabase.com/docs/guides/cli/getting-started#install-the-cli
+       ```
+
+   2.  **ローカルSupabaseサービスの開始:**
+       `supabase`ディレクトリに移動し、ローカルサービスを開始します。
+       ```bash
+       cd supabase
+       supabase start
+       ```
+       これにより、ローカルのSupabase URLとanonキーが出力されます。これらの値で`.env.local`ファイルを更新してください。
+
+   3.  **ローカルSupabaseへのマイグレーションの適用:**
+       プロジェクトのルートから、ローカルのSupabaseインスタンスにマイグレーションをプッシュします。
+       ```bash
+       supabase db push
+       ```
+
+   4.  **ローカルデータベースのシード (オプション):**
+       初期データ用の`seed.sql`ファイル（例: `supabase/seed.sql`）がある場合は、それを実行できます。
+       ```bash
+       supabase db seed
+       ```
+
    **注:** マイグレーションで定義されている `invite_codes` テーブルと `signup_with_invite` 関数が作成されていることを確認してください。また、`events` テーブルには `background_color` と `text_color` カラムが追加されています。最初の招待コードについては、Supabase ダッシュボードから `invite_codes` テーブルに手動で挿入する必要があります。
 
 5. **開発サーバーを起動します:**
