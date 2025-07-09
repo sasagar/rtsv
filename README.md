@@ -102,6 +102,12 @@ This is a real-time audience reaction tool built with Next.js, Supabase, and Soc
    npm run dev
    ```
 
+   By default, the application runs on port `3000`. You can change this by setting the `PORT` environment variable:
+   ```bash
+   PORT=4000 npm run dev
+   ```
+   If you change the port, remember to update the `proxy_pass` directive in your Nginx configuration accordingly.
+
    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Usage

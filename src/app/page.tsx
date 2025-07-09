@@ -1,107 +1,79 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 /**
- * The home page component of the application.
- * This is the default page displayed when accessing the root URL.
- * @returns {JSX.Element} The rendered home page.
+ * The home page component for the Real-time Survey Tool.
+ * Provides entry points for different user roles: Admin, Presenter, and Audience.
  */
 export default function Home() {
   return (
-    <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-sans sm:p-20">
-      <main className="row-start-2 flex flex-col items-center gap-8 sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 font-mono text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="rounded bg-black/[.05] px-1 py-0.5 font-mono font-semibold dark:bg-white/[.06]">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 bg-gray-50 dark:bg-gray-900">
+      <main className="w-full max-w-4xl space-y-8 text-center">
+        <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl">
+          リアルタイムアンケートツール
+        </h1>
+        <p className="mt-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
+          インタラクティブなセッション、プレゼンテーション、イベントでリアルタイムのフィードバックを収集します。
+        </p>
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <a
-            className="flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent bg-foreground text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] sm:h-12 sm:w-auto sm:px-5 sm:text-base"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="flex h-10 w-full items-center justify-center rounded-full border border-solid border-black/[.08] text-sm font-medium transition-colors hover:border-transparent hover:bg-[#f2f2f2] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] sm:h-12 sm:w-auto sm:px-5 sm:text-base md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          {/* Admin Card */}
+          <Card className="flex flex-col items-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">管理者</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-4">
+              <CardDescription className="text-center">
+                イベントの作成、質問の管理、結果の表示を行います。
+              </CardDescription>
+              <Link href="/admin" passHref>
+                <Button className="w-full">管理者ダッシュボードへ</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Audience Card */}
+          <Card className="flex flex-col items-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">参加者</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-4">
+              <CardDescription className="text-center">
+                イベントのアクセスコードを入力して参加します。
+              </CardDescription>
+              <form className="w-full space-y-2">
+                <Label htmlFor="access-code" className="sr-only">アクセスコード</Label>
+                <Input id="access-code" placeholder="アクセスコードを入力" className="text-center" />
+                <Button type="submit" className="w-full">イベントに参加</Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Presenter Card */}
+          <Card className="flex flex-col items-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">プレゼンター</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-4">
+              <CardDescription className="text-center">
+                ライブ結果を聴衆に表示します。
+              </CardDescription>
+              <Link href="/presenter/YOUR_EVENT_ID" passHref> {/* Placeholder for event ID */}
+                <Button className="w-full">プレゼンタービューへ</Button>
+              </Link>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                ※イベントIDは管理者ダッシュボードで確認してください。
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </main>
-      <footer className="row-start-3 flex flex-wrap items-center justify-center gap-6">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="mt-12 text-sm text-gray-500 dark:text-gray-400">
+        &copy; {new Date().getFullYear()} Real-time Survey Tool. All rights reserved.
       </footer>
     </div>
   );
