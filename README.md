@@ -109,3 +109,7 @@ npm run docs
 ```
 
 The generated HTML documentation will be available in the `./docs` directory. Open `docs/index.html` in your browser to view it.
+
+## Live Documentation
+
+The latest API documentation is automatically deployed and available at [https://sasagar.github.io/rtsv/](https://sasagar.github.io/rtsv/).

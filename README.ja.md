@@ -109,3 +109,7 @@ npm run docs
 ```
 
 生成された HTML ドキュメントは `./docs` ディレクトリにあります。ブラウザで `docs/index.html` を開いて確認してください。
+
+## ライブドキュメント
+
+最新のAPIドキュメントは、[https://sasagar.github.io/rtsv/](https://sasagar.github.io/rtsv/) で自動的にデプロイされ、利用可能です。
